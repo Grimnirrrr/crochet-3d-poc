@@ -1,13 +1,11 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
+import { PatternInput } from './components/PatternInput';
 
-// ============================================
-// MAIN APP COMPONENT - FIXED VERSION
-// ============================================
 export default function App() {
-  const mountRef = useRef(null);
-  const sceneRef = useRef(null);
-  const rendererRef = useRef(null);
+    const mountRef = useRef(null);
+    const sceneRef = useRef(null);
+    const rendererRef = useRef(null);
   const cameraRef = useRef(null);
   const animationIdRef = useRef(null);
   const roundGroupsRef = useRef([]);
@@ -16,15 +14,48 @@ export default function App() {
   const [currentRound, setCurrentRound] = useState(0);
   const [totalStitches, setTotalStitches] = useState(0);
   
-  // Hardcoded pattern for Phase 1 POC
-  const pattern = [
+  const [customPattern, setCustomPattern] = useState(null);
+
+  const pattern = customPattern || [
     { round: 1, stitches: 6, instruction: "6 sc in magic ring" },
     { round: 2, stitches: 12, instruction: "2 sc in each (12)" },
     { round: 3, stitches: 18, instruction: "[sc, inc] ×6 (18)" },
     { round: 4, stitches: 24, instruction: "[2 sc, inc] ×6 (24)" },
     { round: 5, stitches: 30, instruction: "[3 sc, inc] ×6 (30)" }
   ];
-  
+
+  const handlePatternParsed = (rounds) => {
+    console.log('Pattern parsed:', rounds);
+    // Reset the scene first
+    resetScene();
+    // Set the new pattern
+    setCustomPattern(rounds);
+  };
+
+  const resetScene = useCallback(() => {
+    if (!sceneRef.current) return;
+    
+    console.log('Resetting scene...');
+    
+    // Clean up all rounds
+    roundGroupsRef.current.forEach(group => {
+      group.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
+          if (child.material) {
+            child.material.dispose();
+          }
+        }
+      });
+      sceneRef.current.remove(group);
+    });
+    
+    roundGroupsRef.current = [];
+    setCurrentRound(0);
+    setTotalStitches(0);
+    setCustomPattern(null);
+  }, []);
+
   // ============================================
   // STITCH AND YARN CREATION FUNCTIONS
   // ============================================
@@ -127,7 +158,7 @@ export default function App() {
     
     return group;
   }, [createStitch, createYarnConnection]);
-  
+
   // ============================================
   // ADD NEXT ROUND FUNCTION
   // ============================================
@@ -188,33 +219,7 @@ export default function App() {
     setCurrentRound(prev => prev + 1);
     setTotalStitches(prev => prev + roundData.stitches);
   }, [currentRound, pattern, createRound, createYarnConnection]);
-  
-  // ============================================
-  // RESET FUNCTION
-  // ============================================
-  const resetScene = useCallback(() => {
-    if (!sceneRef.current) return;
-    
-    console.log('Resetting scene...');
-    
-    // Clean up all rounds
-    roundGroupsRef.current.forEach(group => {
-      group.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry.dispose();
-          if (child.material) {
-            child.material.dispose();
-          }
-        }
-      });
-      sceneRef.current.remove(group);
-    });
-    
-    roundGroupsRef.current = [];
-    setCurrentRound(0);
-    setTotalStitches(0);
-  }, []);
-  
+
   // ============================================
   // INITIALIZE THREE.JS SCENE
   // ============================================
@@ -410,7 +415,7 @@ export default function App() {
       }
     };
   }, []); // Empty dependency array - only run once!
-  
+
   return (
     <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
       <div style={{
@@ -489,7 +494,15 @@ export default function App() {
         </div>
         
         <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
-          Pattern (Hardcoded)
+          Pattern Input
+        </h2>
+        <PatternInput 
+          onPatternParsed={handlePatternParsed}
+          isDisabled={currentRound > 0}
+        />
+        
+        <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
+          Pattern {customPattern ? '(Custom)' : '(Default)'}
         </h2>
         <div style={{
           background: 'rgba(255, 255, 255, 0.1)',
