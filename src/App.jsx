@@ -223,12 +223,17 @@ export default function App() {
   // ============================================
   // INITIALIZE THREE.JS SCENE
   // ============================================
-  useEffect(() => {
-    if (!mountRef.current) return;
-    
-    console.log('Initializing Three.js scene...');
-    console.log('THREE.REVISION:', THREE.REVISION);
-    
+useEffect(() => {
+  if (!mountRef.current) return;
+  
+  // CLEAR ANY EXISTING CANVAS FIRST
+  while (mountRef.current.firstChild) {
+    mountRef.current.removeChild(mountRef.current.firstChild);
+  }
+  
+  console.log('Initializing Three.js scene...');
+  console.log('THREE.REVISION:', THREE.REVISION);
+  
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1a1a2e);
