@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { PatternInput } from './components/PatternInput';
+import { ExportControls } from './components/ExportControls';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -504,6 +505,11 @@ useEffect(() => {
         <PatternInput 
           onPatternParsed={handlePatternParsed}
           isDisabled={currentRound > 0}
+        />
+        
+        <ExportControls 
+          pattern={pattern}
+         currentRound={currentRound}
         />
         
         <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
