@@ -4,6 +4,8 @@ import { PatternInput } from './components/PatternInput';
 import { ExportControls } from './components/ExportControls';
 import { PatternManager } from './components/PatternManager';
 import { YarnCalculator } from './components/YarnCalculator';
+import { BeginnerGuide } from './components/BeginnerGuide';
+import { AccessibilityControls } from './components/AccessibilityControls';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -522,6 +524,13 @@ useEffect(() => {
         <YarnCalculator 
           pattern={pattern}
         />
+        
+        <BeginnerGuide 
+          pattern={pattern}
+          currentRound={currentRound}
+        />
+
+<AccessibilityControls />
 
         <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
           Pattern {customPattern ? '(Custom)' : '(Default)'}
