@@ -6,6 +6,9 @@ import { PatternManager } from './components/PatternManager';
 import { YarnCalculator } from './components/YarnCalculator';
 import { BeginnerGuide } from './components/BeginnerGuide';
 import { AccessibilityControls } from './components/AccessibilityControls';
+import { FeedbackSystem } from './components/FeedbackSystem';
+import { PerformanceMonitor } from './components/PerformanceMonitor';
+import { QuickStartGuide } from './components/QuickStartGuide';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -524,7 +527,7 @@ useEffect(() => {
         <YarnCalculator 
           pattern={pattern}
         />
-        
+
         <BeginnerGuide 
           pattern={pattern}
           currentRound={currentRound}
@@ -595,6 +598,15 @@ useEffect(() => {
       </div>
       
       <div ref={mountRef} style={{ flex: 1, position: 'relative' }} />
-    </div>
+
+ <FeedbackSystem />
+
+<PerformanceMonitor 
+  roundCount={currentRound}
+  stitchCount={totalStitches}
+    />
+<QuickStartGuide />
+
+  </div>
   );
 }
