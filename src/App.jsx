@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { PatternInput } from './components/PatternInput';
 
 export default function App() {
-    const mountRef = useRef(null);
-    const sceneRef = useRef(null);
-    const rendererRef = useRef(null);
+  const mountRef = useRef(null);
+  const sceneRef = useRef(null);
+  const rendererRef = useRef(null);
   const cameraRef = useRef(null);
   const animationIdRef = useRef(null);
   const roundGroupsRef = useRef([]);
