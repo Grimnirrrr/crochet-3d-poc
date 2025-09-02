@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { PatternInput } from './components/PatternInput';
 import { ExportControls } from './components/ExportControls';
+import { PatternManager } from './components/PatternManager';
+import { YarnCalculator } from './components/YarnCalculator';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -512,6 +514,15 @@ useEffect(() => {
          currentRound={currentRound}
         />
         
+        <PatternManager
+          onPatternLoad={handlePatternParsed}
+          currentPattern={pattern}
+        />
+
+        <YarnCalculator 
+          pattern={pattern}
+        />
+
         <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
           Pattern {customPattern ? '(Custom)' : '(Default)'}
         </h2>
