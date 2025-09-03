@@ -14,6 +14,7 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { LearningResources } from './components/LearningResources';
 import { IntegrationPlan } from './components/IntegrationPlan';
 import { AuthPlanning } from './components/AuthPlanning';
+import { SafetyCheck } from './components/SafetyCheck';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -546,6 +547,7 @@ useEffect(() => {
 <LearningResources />
 <IntegrationPlan />
 <AuthPlanning />
+<SafetyCheck />
 
         <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
           Pattern {customPattern ? '(Custom)' : '(Default)'}
