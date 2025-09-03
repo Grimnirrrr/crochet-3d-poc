@@ -9,6 +9,8 @@ import { AccessibilityControls } from './components/AccessibilityControls';
 import { FeedbackSystem } from './components/FeedbackSystem';
 import { PerformanceMonitor } from './components/PerformanceMonitor';
 import { QuickStartGuide } from './components/QuickStartGuide';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard'; 
+import { useAnalytics } from './hooks/useAnalytics';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -18,7 +20,8 @@ export default function App() {
   const animationIdRef = useRef(null);
   const roundGroupsRef = useRef([]);
   const mouseControlsRef = useRef({ targetRotationX: 0, targetRotationY: 0 });
-  
+  const { trackEvent } = useAnalytics();
+
   const [currentRound, setCurrentRound] = useState(0);
   const [totalStitches, setTotalStitches] = useState(0);
   
@@ -34,6 +37,7 @@ export default function App() {
 
   const handlePatternParsed = (rounds) => {
     console.log('Pattern parsed:', rounds);
+    trackEvent('pattern_parsed', { rounds: rounds.length });
     // Reset the scene first
     resetScene();
     // Set the new pattern
@@ -44,7 +48,7 @@ export default function App() {
     if (!sceneRef.current) return;
     
     console.log('Resetting scene...');
-    
+    trackEvent('reset_scene');
     // Clean up all rounds
     roundGroupsRef.current.forEach(group => {
       group.traverse((child) => {
@@ -178,6 +182,8 @@ export default function App() {
       return;
     }
     
+    trackEvent('add_round', { roundNumber: currentRound + 1 });
+
     const roundData = pattern[currentRound];
     const yPosition = currentRound * 0.4;
     
@@ -607,6 +613,7 @@ useEffect(() => {
     />
 <QuickStartGuide />
 
+<AnalyticsDashboard />
   </div>
   );
 }
