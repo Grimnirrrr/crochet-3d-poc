@@ -11,6 +11,7 @@ import { PerformanceMonitor } from './components/PerformanceMonitor';
 import { QuickStartGuide } from './components/QuickStartGuide';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard'; 
 import { useAnalytics } from './hooks/useAnalytics';
+import { LearningResources } from './components/LearningResources';
 
 export default function App() {
   const mountRef = useRef(null);
@@ -540,6 +541,7 @@ useEffect(() => {
         />
 
 <AccessibilityControls />
+<LearningResources />
 
         <h2 style={{ fontSize: '18px', margin: '20px 0 10px', color: '#fbbf24' }}>
           Pattern {customPattern ? '(Custom)' : '(Default)'}
@@ -614,6 +616,7 @@ useEffect(() => {
 <QuickStartGuide />
 
 <AnalyticsDashboard />
+
   </div>
   );
 }
