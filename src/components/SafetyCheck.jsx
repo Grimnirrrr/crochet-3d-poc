@@ -69,12 +69,17 @@ export function SafetyCheck() {
           description: 'Local storage save/load functional',
           critical: true
         },
+
         {
-          id: 'func-4',
-          name: '3D Visualization',
-          test: () => typeof THREE !== 'undefined',
-          description: 'Three.js rendering properly',
-          critical: true
+            id: 'func-4',
+            name: '3D Visualization',
+            test: () => {
+            // Check if renderer exists in the DOM
+            const canvas = document.querySelector('canvas');
+            return canvas !== null;
+        },
+            description: 'Three.js rendering properly',
+            critical: true
         }
       ]
     },
