@@ -253,192 +253,192 @@ useEffect(() => {
   console.log('Initializing Three.js scene...');
   console.log('THREE.REVISION:', THREE.REVISION);
   
-    // Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a2e);
-    scene.fog = new THREE.Fog(0x1a1a2e, 10, 50);
-    sceneRef.current = scene;
+  // Scene setup
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1a1a2e);
+  scene.fog = new THREE.Fog(0x1a1a2e, 10, 50);
+  sceneRef.current = scene;
+  
+  // Camera setup
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    (mountRef.current.clientWidth) / mountRef.current.clientHeight,
+    0.1,
+    1000
+  );
+  camera.position.set(5, 8, 10);
+  camera.lookAt(0, 0, 0);
+  cameraRef.current = camera;
+  
+  // Renderer setup
+  const renderer = new THREE.WebGLRenderer({ 
+    antialias: true,
+    alpha: true
+  });
+  renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  mountRef.current.appendChild(renderer.domElement);
+  rendererRef.current = renderer;
+  
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
+  
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(5, 10, 5);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.camera.near = 0.1;
+  directionalLight.shadow.camera.far = 50;
+  scene.add(directionalLight);
+  
+  const pointLight = new THREE.PointLight(0xfbbf24, 0.5);
+  pointLight.position.set(-5, 5, -5);
+  scene.add(pointLight);
+  
+  // Ground plane
+  const groundGeometry = new THREE.PlaneGeometry(20, 20);
+  const groundMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0x2d3748,
+    roughness: 0.8
+  });
+  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -1;
+  ground.receiveShadow = true;
+  scene.add(ground);
+  
+  // Grid helper
+  const gridHelper = new THREE.GridHelper(20, 20, 0x4a5568, 0x2d3748);
+  gridHelper.position.y = -0.99;
+  scene.add(gridHelper);
+  
+  // Add magic ring center
+  const ringGeometry = new THREE.TorusGeometry(0.3, 0.05, 8, 16);
+  const ringMaterial = new THREE.MeshStandardMaterial({ 
+    color: 0xdc2626,
+    emissive: 0xdc2626,
+    emissiveIntensity: 0.2
+  });
+  const magicRing = new THREE.Mesh(ringGeometry, ringMaterial);
+  magicRing.rotation.x = -Math.PI / 2;
+  magicRing.castShadow = true;
+  scene.add(magicRing);
+  
+  // Mouse controls (NO OrbitControls!)
+  let isMouseDown = false;
+  let mouseX = 0;
+  let mouseY = 0;
+  
+  const handleMouseDown = () => { isMouseDown = true; };
+  const handleMouseUp = () => { isMouseDown = false; };
+  
+  const handleMouseMove = (e) => {
+    if (!isMouseDown) return;
     
-    // Camera setup
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      (mountRef.current.clientWidth) / mountRef.current.clientHeight,
-      0.1,
-      1000
-    );
-    camera.position.set(5, 8, 10);
-    camera.lookAt(0, 0, 0);
-    cameraRef.current = camera;
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     
-    // Renderer setup
-    const renderer = new THREE.WebGLRenderer({ 
-      antialias: true,
-      alpha: true
+    mouseControlsRef.current.targetRotationY = mouseX * Math.PI;
+    mouseControlsRef.current.targetRotationX = mouseY * Math.PI * 0.5;
+  };
+  
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const zoomSpeed = 0.1;
+    camera.position.multiplyScalar(1 + e.deltaY * zoomSpeed * 0.01);
+    
+    // Clamp zoom
+    const distance = camera.position.length();
+    if (distance < 5) camera.position.normalize().multiplyScalar(5);
+    if (distance > 30) camera.position.normalize().multiplyScalar(30);
+  };
+  
+  renderer.domElement.addEventListener('mousedown', handleMouseDown);
+  renderer.domElement.addEventListener('mouseup', handleMouseUp);
+  renderer.domElement.addEventListener('mouseleave', handleMouseUp);
+  renderer.domElement.addEventListener('mousemove', handleMouseMove);
+  renderer.domElement.addEventListener('wheel', handleWheel);
+  
+  // Animation loop
+  let frameCount = 0;
+  const animate = () => {
+    animationIdRef.current = requestAnimationFrame(animate);
+    frameCount++;
+    
+    // Smooth camera rotation
+    const cameraRadius = camera.position.length();
+    const smoothing = 0.05;
+    
+    const currentRotationY = Math.atan2(camera.position.x, camera.position.z);
+    const currentRotationX = Math.asin(camera.position.y / cameraRadius);
+    
+    const newRotationY = currentRotationY + (mouseControlsRef.current.targetRotationY - currentRotationY) * smoothing;
+    const newRotationX = currentRotationX + (mouseControlsRef.current.targetRotationX - currentRotationX) * smoothing;
+    
+    camera.position.x = Math.sin(newRotationY) * Math.cos(newRotationX) * cameraRadius;
+    camera.position.y = Math.sin(newRotationX) * cameraRadius;
+    camera.position.z = Math.cos(newRotationY) * Math.cos(newRotationX) * cameraRadius;
+    
+    camera.lookAt(0, 2, 0);
+    
+    // Rotate rounds slightly for visual interest
+    roundGroupsRef.current.forEach((group, i) => {
+      group.rotation.y += 0.001 * (i + 1);
     });
+    
+    // Memory monitoring every 300 frames (5 seconds at 60fps)
+    if (frameCount % 300 === 0) {
+      console.log('Memory:', {
+        geometries: renderer.info.memory.geometries,
+        textures: renderer.info.memory.textures,
+        programs: renderer.info.programs?.length
+      });
+    }
+    
+    renderer.render(scene, camera);
+  };
+  animate();
+  
+  // Handle window resize
+  const handleResize = () => {
+    if (!mountRef.current) return;
+    camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+    camera.updateProjectionMatrix();
     renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    mountRef.current.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+  };
+  window.addEventListener('resize', handleResize);
+  
+  // Cleanup
+  return () => {
+    console.log('Cleaning up Three.js...');
     
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-    scene.add(ambientLight);
+    cancelAnimationFrame(animationIdRef.current);
     
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = true;
-    directionalLight.shadow.camera.near = 0.1;
-    directionalLight.shadow.camera.far = 50;
-    scene.add(directionalLight);
+    renderer.domElement.removeEventListener('mousedown', handleMouseDown);
+    renderer.domElement.removeEventListener('mouseup', handleMouseUp);
+    renderer.domElement.removeEventListener('mouseleave', handleMouseUp);
+    renderer.domElement.removeEventListener('mousemove', handleMouseMove);
+    renderer.domElement.removeEventListener('wheel', handleWheel);
+    window.removeEventListener('resize', handleResize);
     
-    const pointLight = new THREE.PointLight(0xfbbf24, 0.5);
-    pointLight.position.set(-5, 5, -5);
-    scene.add(pointLight);
-    
-    // Ground plane
-    const groundGeometry = new THREE.PlaneGeometry(20, 20);
-    const groundMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0x2d3748,
-      roughness: 0.8
-    });
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -1;
-    ground.receiveShadow = true;
-    scene.add(ground);
-    
-    // Grid helper
-    const gridHelper = new THREE.GridHelper(20, 20, 0x4a5568, 0x2d3748);
-    gridHelper.position.y = -0.99;
-    scene.add(gridHelper);
-    
-    // Add magic ring center
-    const ringGeometry = new THREE.TorusGeometry(0.3, 0.05, 8, 16);
-    const ringMaterial = new THREE.MeshStandardMaterial({ 
-      color: 0xdc2626,
-      emissive: 0xdc2626,
-      emissiveIntensity: 0.2
-    });
-    const magicRing = new THREE.Mesh(ringGeometry, ringMaterial);
-    magicRing.rotation.x = -Math.PI / 2;
-    magicRing.castShadow = true;
-    scene.add(magicRing);
-    
-    // Mouse controls (NO OrbitControls!)
-    let isMouseDown = false;
-    let mouseX = 0;
-    let mouseY = 0;
-    
-    const handleMouseDown = () => { isMouseDown = true; };
-    const handleMouseUp = () => { isMouseDown = false; };
-    
-    const handleMouseMove = (e) => {
-      if (!isMouseDown) return;
-      
-      const rect = renderer.domElement.getBoundingClientRect();
-      mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      
-      mouseControlsRef.current.targetRotationY = mouseX * Math.PI;
-      mouseControlsRef.current.targetRotationX = mouseY * Math.PI * 0.5;
-    };
-    
-    const handleWheel = (e) => {
-      e.preventDefault();
-      const zoomSpeed = 0.1;
-      camera.position.multiplyScalar(1 + e.deltaY * zoomSpeed * 0.01);
-      
-      // Clamp zoom
-      const distance = camera.position.length();
-      if (distance < 5) camera.position.normalize().multiplyScalar(5);
-      if (distance > 30) camera.position.normalize().multiplyScalar(30);
-    };
-    
-    renderer.domElement.addEventListener('mousedown', handleMouseDown);
-    renderer.domElement.addEventListener('mouseup', handleMouseUp);
-    renderer.domElement.addEventListener('mouseleave', handleMouseUp);
-    renderer.domElement.addEventListener('mousemove', handleMouseMove);
-    renderer.domElement.addEventListener('wheel', handleWheel);
-    
-    // Animation loop
-    let frameCount = 0;
-    const animate = () => {
-      animationIdRef.current = requestAnimationFrame(animate);
-      frameCount++;
-      
-      // Smooth camera rotation
-      const cameraRadius = camera.position.length();
-      const smoothing = 0.05;
-      
-      const currentRotationY = Math.atan2(camera.position.x, camera.position.z);
-      const currentRotationX = Math.asin(camera.position.y / cameraRadius);
-      
-      const newRotationY = currentRotationY + (mouseControlsRef.current.targetRotationY - currentRotationY) * smoothing;
-      const newRotationX = currentRotationX + (mouseControlsRef.current.targetRotationX - currentRotationX) * smoothing;
-      
-      camera.position.x = Math.sin(newRotationY) * Math.cos(newRotationX) * cameraRadius;
-      camera.position.y = Math.sin(newRotationX) * cameraRadius;
-      camera.position.z = Math.cos(newRotationY) * Math.cos(newRotationX) * cameraRadius;
-      
-      camera.lookAt(0, 2, 0);
-      
-      // Rotate rounds slightly for visual interest
-      roundGroupsRef.current.forEach((group, i) => {
-        group.rotation.y += 0.001 * (i + 1);
-      });
-      
-      // Memory monitoring every 300 frames (5 seconds at 60fps)
-      if (frameCount % 300 === 0) {
-        console.log('Memory:', {
-          geometries: renderer.info.memory.geometries,
-          textures: renderer.info.memory.textures,
-          programs: renderer.info.programs?.length
-        });
-      }
-      
-      renderer.render(scene, camera);
-    };
-    animate();
-    
-    // Handle window resize
-    const handleResize = () => {
-      if (!mountRef.current) return;
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
-    };
-    window.addEventListener('resize', handleResize);
-    
-    // Cleanup
-    return () => {
-      console.log('Cleaning up Three.js...');
-      
-      cancelAnimationFrame(animationIdRef.current);
-      
-      renderer.domElement.removeEventListener('mousedown', handleMouseDown);
-      renderer.domElement.removeEventListener('mouseup', handleMouseUp);
-      renderer.domElement.removeEventListener('mouseleave', handleMouseUp);
-      renderer.domElement.removeEventListener('mousemove', handleMouseMove);
-      renderer.domElement.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('resize', handleResize);
-      
-      // Clean up all objects
-      scene.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.geometry.dispose();
-          if (child.material) {
-            child.material.dispose();
-          }
+    // Clean up all objects
+    scene.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.geometry.dispose();
+        if (child.material) {
+          child.material.dispose();
         }
-      });
-      
-      renderer.dispose();
-      if (mountRef.current && renderer.domElement) {
-        mountRef.current.removeChild(renderer.domElement);
       }
-    };
-  }, []); // Empty dependency array - only run once!
+    });
+    
+    renderer.dispose();
+    if (mountRef.current && renderer.domElement) {
+      mountRef.current.removeChild(renderer.domElement);
+    }
+  };
+}, []); // Empty dependency array - only run once!
 
   return (
     <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>

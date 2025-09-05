@@ -1,5 +1,6 @@
 // src/types/assemblyModels.js
 import { toSafeVector3, toSafeColor, createSafePieceData } from '../utils/safeTypes';
+import { safeLocalStorageSet, safeLocalStorageGet } from '../utils/safeSerialize';
 
 /**
  * CrochetPiece class - represents a modular piece
@@ -76,5 +77,41 @@ export class Assembly {
       history: [...this.history],
       locked: Array.from(this.locked)
     };
+  }
+  
+  // Save to localStorage
+  save() {
+    const safeData = this.toSafeData();
+    const success = safeLocalStorageSet(`assembly_${this.id}`, safeData);
+    if (success) {
+      console.log('Assembly saved successfully');
+    }
+    return success;
+  }
+  
+  // Load from localStorage
+  static load(assemblyId) {
+    const data = safeLocalStorageGet(`assembly_${assemblyId}`);
+    if (data) {
+      const assembly = new Assembly();
+      assembly.id = data.id;
+      assembly.name = data.name;
+      
+      // Reconstruct pieces
+      if (data.pieces) {
+        data.pieces.forEach(pieceData => {
+          const piece = new CrochetPiece(pieceData);
+          assembly.pieces.set(piece.id, piece);
+        });
+      }
+      
+      assembly.connections = data.connections || [];
+      assembly.history = data.history || [];
+      assembly.locked = new Set(data.locked || []);
+      
+      console.log('Assembly loaded successfully');
+      return assembly;
+    }
+    return null;
   }
 }
