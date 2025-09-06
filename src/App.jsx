@@ -17,6 +17,8 @@ import { AuthPlanning } from './components/AuthPlanning';
 import { SafetyCheck } from './components/SafetyCheck';
 import { CrochetPiece, Assembly } from './types/assemblyModels';
 import { toSafeVector3, isSafeObject } from './utils/safeTypes';
+import { containsThreeJS, createSaveMonitor, stripThreeJS } from './utils/sanitizer';
+
 
 export default function App() {
   const mountRef = useRef(null);
@@ -239,10 +241,12 @@ export default function App() {
     setCurrentRound(prev => prev + 1);
     setTotalStitches(prev => prev + roundData.stitches);
   }, [currentRound, pattern, createRound, createYarnConnection]);
+
 // ============================================
   // INITIALIZE THREE.JS SCENE
   // ============================================
-useEffect(() => {
+
+  useEffect(() => {
   if (!mountRef.current) return;
   
   // CLEAR ANY EXISTING CANVAS FIRST

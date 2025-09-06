@@ -1,4 +1,5 @@
 // src/utils/safeSerialize.js
+import { containsThreeJS, stripThreeJS, sanitizeForStorage } from './sanitizer';
 
 /**
  * Whitelist of allowed keys that can be saved
@@ -104,10 +105,18 @@ export function safeParse(jsonString) {
 }
 
 /**
- * Safe localStorage setter
+ * Safe localStorage setter - UPDATED VERSION WITH SANITIZER
  */
 export function safeLocalStorageSet(key, data) {
-  const cleaned = cleanObject(data);
+  // First run through sanitizer
+  const sanitized = sanitizeForStorage(data, key);
+  if (!sanitized) {
+    console.error(`Data for ${key} failed sanitization`);
+    return false;
+  }
+  
+  // Then clean with whitelist
+  const cleaned = cleanObject(sanitized);
   const stringified = safeStringify(cleaned);
   
   if (stringified) {
