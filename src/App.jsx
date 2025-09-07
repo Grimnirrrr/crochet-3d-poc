@@ -18,6 +18,7 @@ import { SafetyCheck } from './components/SafetyCheck';
 import { CrochetPiece, Assembly } from './types/assemblyModels';
 import { toSafeVector3, isSafeObject } from './utils/safeTypes';
 import { containsThreeJS, createSaveMonitor, stripThreeJS } from './utils/sanitizer';
+import { isValidConnection } from './utils/assemblyValidator';
 
 
 export default function App() {
@@ -442,7 +443,11 @@ export default function App() {
       mountRef.current.removeChild(renderer.domElement);
     }
   };
+
 }, []); // Empty dependency array - only run once!
+
+
+
 
   return (
     <div style={{ display: 'flex', height: '100vh', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>

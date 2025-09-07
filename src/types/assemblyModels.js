@@ -1,6 +1,7 @@
 // src/types/assemblyModels.js
 import { toSafeVector3, toSafeColor, createSafePieceData } from '../utils/safeTypes';
 import { safeLocalStorageSet, safeLocalStorageGet } from '../utils/safeSerialize';
+import { isValidConnection, validateAssembly } from '../utils/assemblyValidator';
 
 /**
  * CrochetPiece class - represents a modular piece
@@ -21,19 +22,19 @@ export class CrochetPiece {
     };
   }
   
-  // Add connection point
-  addConnectionPoint(name, position, compatible = []) {
-    const point = {
-      id: `${this.id}-${name}`,
-      name,
-      position: toSafeVector3(position),
-      compatible,
-      isOccupied: false
-    };
-    this.connectionPoints.push(point);
-    return point;
-  }
-  
+// Add connection point
+addConnectionPoint(name, position, compatible = []) {
+  const point = {
+    id: `${this.id}-${name}`,
+    name,
+    position: toSafeVector3(position),
+    compatible,
+    isOccupied: false,
+    pieceId: this.id  // ADD THIS LINE
+  };
+  this.connectionPoints.push(point);
+  return point;
+}  
   // Get safe data for saving (no Three.js refs)
   toSafeData() {
     return createSafePieceData(this);
@@ -51,6 +52,25 @@ export class Assembly {
     this.connections = [];
     this.history = [];
     this.locked = new Set();
+  }
+  // Add this method to Assembly class
+  canConnect(piece1Id, point1Id, piece2Id, point2Id) {
+    const piece1 = this.pieces.get(piece1Id);
+    const piece2 = this.pieces.get(piece2Id);
+    
+    if (!piece1 || !piece2) {
+      return { valid: false, reason: 'Piece not found' };
+    }
+    
+    const point1 = piece1.connectionPoints.find(p => p.id === point1Id);
+    const point2 = piece2.connectionPoints.find(p => p.id === point2Id);
+    
+    return isValidConnection(point1, point2, this.pieces);
+  }
+  
+  // Add validation before save
+  validate() {
+    return validateAssembly(this);
   }
   
   addPiece(piece) {
@@ -113,5 +133,7 @@ export class Assembly {
       return assembly;
     }
     return null;
+
+
   }
 }
