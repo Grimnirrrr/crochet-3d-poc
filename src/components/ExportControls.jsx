@@ -356,6 +356,8 @@ export function ExportControls({ pattern, currentRound }) {
       }}>
         💡 <strong>Tip:</strong> JSON preserves all data for re-import. PDF is best for printing. Text is for simple sharing.
       </div>
+
+
     </div>
   );
 }

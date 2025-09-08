@@ -19,6 +19,8 @@ import { CrochetPiece, Assembly } from './types/assemblyModels';
 import { toSafeVector3, isSafeObject } from './utils/safeTypes';
 import { containsThreeJS, createSaveMonitor, stripThreeJS } from './utils/sanitizer';
 import { isValidConnection } from './utils/assemblyValidator';
+import './test-tier-enforcement.js';
+
 
 
 export default function App() {
