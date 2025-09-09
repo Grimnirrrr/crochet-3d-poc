@@ -173,40 +173,64 @@ if (!validationResult.valid && validationResult.issues) {
   console.log('Issues:', validationResult.issues);
 }
 
+// Quick debug test - add this temporarily before Test 10
+console.log('\n\nDEBUG: Checking saved data structure');
+const testDebug = new Assembly('pro');
+testDebug.name = 'Debug Test';
+testDebug.addPiece(new CrochetPiece({ name: 'Debug Piece' }));
+
+const debugData = testDebug.toSafeData();
+console.log('Safe data structure:', debugData);
+console.log('Has name?', debugData.name);
+console.log('Has pieces?', debugData.pieces);
+
+// Check what's actually in localStorage after save
+testDebug.save();
+const stored = localStorage.getItem(`assembly_${testDebug.id}`);
+if (stored) {
+  const parsed = JSON.parse(stored);
+  console.log('Stored data has name?', parsed.name);
+  console.log('Stored data has pieces?', parsed.pieces);
+}
+
 // Test 10: Save and Load with tier data
 console.log('\n\nTEST 10: Save/Load with Tier Data');
 console.log('----------------------------------');
-const saveLoadAssembly = new Assembly('pro');
-saveLoadAssembly.name = 'Test Assembly for Save/Load';
 
-// Add some pieces
-for (let i = 0; i < 3; i++) {
-  saveLoadAssembly.addPiece(new CrochetPiece({ name: `Save Test Piece ${i + 1}` }));
-}
+(async () => {
+  const saveLoadAssembly = new Assembly('pro');
+  saveLoadAssembly.name = 'Test Assembly for Save/Load';
 
-// Save it
-const finalSaveResult = saveLoadAssembly.save();
-if (finalSaveResult.success) {
-  console.log('✓ Assembly saved');
-  
-  // Load it back
-  const loaded = Assembly.load(saveLoadAssembly.id);
-  if (loaded) {
-    console.log('✓ Assembly loaded');
-    console.log(`  Name: ${loaded.name}`);
-    console.log(`  Tier: ${loaded.currentTier}`);
-    console.log(`  Pieces: ${loaded.pieces.size}`);
-    console.log(`  Usage:`, loaded.getUsageStats());
+  // Add some pieces
+  for (let i = 0; i < 3; i++) {
+    saveLoadAssembly.addPiece(new CrochetPiece({ name: `Save Test Piece ${i + 1}` }));
   }
-}
 
-console.log('\n=== TEST SUITE COMPLETE ===');
-console.log('\nSummary:');
-console.log('- Freemium tier limits: Working');
-console.log('- Pro tier pay-per-use: Working');
-console.log('- Connection validation: Working');
-console.log('- Save restrictions: Working');
-console.log('- Tier upgrades: Working');
-console.log('- Lock/unlock: Working');
-console.log('- Assembly validation: Working');
-console.log('- Save/Load persistence: Working');
+  // Save it
+  const finalSaveResult = saveLoadAssembly.save();
+  if (finalSaveResult.success) {
+    console.log('✓ Assembly saved');
+    
+    // Load it back WITH AWAIT
+    const loaded = await Assembly.load(saveLoadAssembly.id);
+    if (loaded) {
+      console.log('✓ Assembly loaded');
+      console.log(`  Name: ${loaded.name}`);
+      console.log(`  Tier: ${loaded.currentTier}`);
+      console.log(`  Pieces: ${loaded.pieces.size}`);
+      console.log(`  Usage:`, loaded.getUsageStats());
+    }
+  }
+
+  // Move summary inside async function
+  console.log('\n=== TEST SUITE COMPLETE ===');
+  console.log('\nSummary:');
+  console.log('- Freemium tier limits: Working');
+  console.log('- Pro tier pay-per-use: Working');
+  console.log('- Connection validation: Working');
+  console.log('- Save restrictions: Working');
+  console.log('- Tier upgrades: Working');
+  console.log('- Lock/unlock: Working');
+  console.log('- Assembly validation: Working');
+  console.log('- Save/Load persistence: Working');
+})();

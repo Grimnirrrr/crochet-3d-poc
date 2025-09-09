@@ -20,7 +20,7 @@ import { toSafeVector3, isSafeObject } from './utils/safeTypes';
 import { containsThreeJS, createSaveMonitor, stripThreeJS } from './utils/sanitizer';
 import { isValidConnection } from './utils/assemblyValidator';
 import './test-tier-enforcement.js';
-
+import './test-recovery.js';
 
 
 export default function App() {
