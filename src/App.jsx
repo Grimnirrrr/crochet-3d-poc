@@ -21,6 +21,7 @@ import { containsThreeJS, createSaveMonitor, stripThreeJS } from './utils/saniti
 import { isValidConnection } from './utils/assemblyValidator';
 import './test-tier-enforcement.js';
 import './test-recovery.js';
+import './test-piece-system.js';
 
 
 export default function App() {
