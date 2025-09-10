@@ -19,10 +19,15 @@ import { CrochetPiece, Assembly } from './types/assemblyModels';
 import { toSafeVector3, isSafeObject } from './utils/safeTypes';
 import { containsThreeJS, createSaveMonitor, stripThreeJS } from './utils/sanitizer';
 import { isValidConnection } from './utils/assemblyValidator';
-import './test-tier-enforcement.js';
-import './test-recovery.js';
-import './test-piece-system.js';
-import './test-connection-ui.js';
+// import './test-tier-enforcement.js';
+// import './test-recovery.js';
+// import './test-piece-system.js';
+// import './test-connection-ui.js';
+// import './test-drag-drop.js';
+// import { useDragDrop } from './hooks/useDragDrop';
+// import { DragDropControls } from './components/DragDropControls';
+// import './test-drag-drop.js';
+
 
 export default function App() {
   const mountRef = useRef(null);
@@ -266,7 +271,7 @@ export default function App() {
   scene.background = new THREE.Color(0x1a1a2e);
   scene.fog = new THREE.Fog(0x1a1a2e, 10, 50);
   sceneRef.current = scene;
-  
+
   // Camera setup
   const camera = new THREE.PerspectiveCamera(
     75,

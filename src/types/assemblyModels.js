@@ -87,6 +87,39 @@ canConnect(piece1Id, point1Id, piece2Id, point2Id) {
   return isValidConnection(point1, point2, this.pieces);
 }
 
+updatePiecePosition(pieceId, newPosition) {
+  const piece = this.pieces.get(pieceId);
+  
+  if (!piece) {
+    console.warn(`Piece ${pieceId} not found in assembly`);
+    return false;
+  }
+  
+  // Ensure the position is safe (no Three.js objects)
+  const safePosition = toSafeVector3(
+    newPosition.x || 0,
+    newPosition.y || 0,
+    newPosition.z || 0
+  );
+  
+  // Update the piece position
+  piece.position = safePosition;
+  
+  // Add to history
+  this.history.push({
+    action: 'move',
+    pieceId: pieceId,
+    oldPosition: piece.position,
+    newPosition: safePosition,
+    timestamp: Date.now()
+  });
+  
+  // Log the update
+  console.log(`Updated position for ${piece.name}:`, safePosition);
+  
+  return true;
+}
+
 // Add this new method:
 _directConnect(piece1Id, point1Id, piece2Id, point2Id) {
   return this._performConnection(piece1Id, point1Id, piece2Id, point2Id);
