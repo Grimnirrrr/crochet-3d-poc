@@ -73,20 +73,25 @@ export class Assembly {
   }
   
   // Validation method
-  canConnect(piece1Id, point1Id, piece2Id, point2Id) {
-    const piece1 = this.pieces.get(piece1Id);
-    const piece2 = this.pieces.get(piece2Id);
-    
-    if (!piece1 || !piece2) {
-      return { valid: false, reason: 'Piece not found' };
-    }
-    
-    const point1 = piece1.connectionPoints.find(p => p.id === point1Id);
-    const point2 = piece2.connectionPoints.find(p => p.id === point2Id);
-    
-    return isValidConnection(point1, point2, this.pieces);
+canConnect(piece1Id, point1Id, piece2Id, point2Id) {
+  const piece1 = this.pieces.get(piece1Id);
+  const piece2 = this.pieces.get(piece2Id);
+  
+  if (!piece1 || !piece2) {
+    return { valid: false, reason: 'Piece not found' };
   }
   
+  const point1 = piece1.connectionPoints?.find(p => p.id === point1Id);
+  const point2 = piece2.connectionPoints?.find(p => p.id === point2Id);
+  
+  return isValidConnection(point1, point2, this.pieces);
+}
+
+// Add this new method:
+_directConnect(piece1Id, point1Id, piece2Id, point2Id) {
+  return this._performConnection(piece1Id, point1Id, piece2Id, point2Id);
+}
+
   // Validate assembly
   validate() {
     return validateAssembly(this);

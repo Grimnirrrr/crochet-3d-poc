@@ -22,7 +22,7 @@ import { isValidConnection } from './utils/assemblyValidator';
 import './test-tier-enforcement.js';
 import './test-recovery.js';
 import './test-piece-system.js';
-
+import './test-connection-ui.js';
 
 export default function App() {
   const mountRef = useRef(null);

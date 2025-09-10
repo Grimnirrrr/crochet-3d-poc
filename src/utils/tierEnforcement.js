@@ -211,9 +211,9 @@ export function guardedConnect(assembly, piece1Id, point1Id, piece2Id, point2Id,
   }
   
   // Perform the connection
-  const connected = assembly.connect ? 
-    assembly.connect(piece1Id, point1Id, piece2Id, point2Id) : true;
-  
+const connected = assembly._directConnect ? 
+  assembly._directConnect(piece1Id, point1Id, piece2Id, point2Id) : true;
+    
   return {
     success: connected,
     reason: connected ? 'CONNECTION_SUCCESSFUL' : 'CONNECTION_FAILED',
