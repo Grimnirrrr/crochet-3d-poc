@@ -96,9 +96,8 @@ export default function App() {
     const color = type === 'inc' ? 0xf59e0b : 0xfbbf24;
     const material = new THREE.MeshPhongMaterial({ 
       color,
-      roughness: 0.5,
-      metalness: 0.2,
-      shininess: 100
+      shininess: 100,
+      specular: 0x222222  // Add this for a better look
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.castShadow = true;
